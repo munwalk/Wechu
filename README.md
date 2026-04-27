@@ -1,176 +1,302 @@
-# Wechu
+# 🎓 WEcHU (We Chat, Helps U)
 
-## 서버 실행
+<div align="center">
 
-### Backend 실행
-```bash
-cd fastapi-test
+### 광운대학교 학생을 위한 All-in-One AI 학사·진로 상담 챗봇
 
-# 가상환경 활성화
-.venv\Scripts\activate
+**한국 최초의 통합형 대학 학사 행정 RAG 챗봇**
 
-# 서버 실행
-uvicorn app:app --reload --host 127.0.0.1 --port 8000
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/)
+[![React](https://img.shields.io/badge/React-18.0+-61DAFB.svg)](https://reactjs.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688.svg)](https://fastapi.tiangolo.com/)
+
+</div>
+
+---
+
+## 📋 목차
+
+- [프로젝트 소개](#-프로젝트-소개)
+- [주요 기능](#-주요-기능)
+- [기술 아키텍처](#-기술-아키텍처)
+- [시스템 특징](#-시스템-특징)
+- [실험 결과](#-실험-결과)
+- [팀원 소개](#-팀원-소개)
+
+---
+
+## 🎯 프로젝트 소개
+
+WEcHU는 **광운대학교 학생들의 학사 및 진로 고민을 해결**하기 위한 AI 기반 통합 상담 챗봇입니다. 
+
+### 🚀 Why WEcHU?
+
+대학생들은 입학과 동시에 다양한 과업을 마주하게 됩니다:
+- 🎓 **전공 선택** 및 학업 설계
+- 📚 **졸업 요건** 파악 (이수 구분, 재수강 기준 등)
+- 💼 **진로 탐색** 및 커리어 플래닝
+
+하지만 이런 정보들은...
+- 📄 학교 홈페이지, 교과과정 안내문, 진로센터 등 **여러 시스템에 분산**
+- 🔍 복잡한 규정으로 인한 **낮은 접근성**
+- ⏰ 전문 상담센터 이용의 **시간·비용 제약**
+
+**WEcHU는 이 모든 문제를 해결합니다!** 🎉
+
+### ✨ 차별화 포인트
+
+WEcHU는 기존 대학 챗봇들과 다릅니다:
+
+| 구분 | 기존 챗봇 | WEcHU |
+|------|----------|--------|
+| 서비스 범위 | 1~2개 도메인 | **4개 전체 도메인** (학사·정책·진로·졸업) |
+| 응답 방식 | 단순 FAQ | **RAG 기반 맞춤형 상담** |
+| 정확도 | 60~70% | **96.88%** |
+| 개인화 | ❌ | **✅** (S모델 페르소나) |
+| 멀티턴 대화 | 제한적 | **완벽 지원** (150턴 학습) |
+
+---
+
+## 🌟 주요 기능
+
+### 1. 💡 강의 탐색
+- 난이도별 강의 추천
+- 실시간 강의 평점 및 후기 제공
+- 상황에 맞는 맞춤형 강의 제안
+
+### 2. 📊 학업 현황 관리
+- 졸업 요건 자동 체크
+- 필수 과목 이수 현황
+- 현재 학점 상태 점검
+- 재수강 규정 안내
+
+### 3. 🎯 진로 상담
+- 개인 수강 이력 기반 로드맵 제시
+- 심층 진로 고민 상담
+- 진로 목표 맞춤형 조언
+- 정서적 지지 + 구체적 솔루션 제공
+
+### 4. 🛡️ 안전성 보장
+- Safety 필터링 시스템
+- Fallback 응답 설계
+- 할루시네이션 최소화 (96.88% 정확도)
+
+---
+
+## 🏗️ 기술 아키텍처
+
+### 시스템 구조도
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                         사용자 인터페이스                    │
+│                    (React/Vite Frontend)                    │
+└────────────────┬────────────────────────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────────────────────────┐
+│                      FastAPI Backend                        │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │          의도 분석 & 라우팅 레이어                     │   │
+│  │    (정보 검색 모드 ↔ 심층 상담 모드)                   │   │
+│  └──────────────┬───────────────────────────────────────┘   │
+│                 │                                           │
+│  ┌──────────────▼────────────────────────────────────────┐  │
+│  │              RAG 파이프라인                            │  │
+│  │  ┌──────────┬──────────┬──────────┬──────────────┐    │  │
+│  │  │1. 전처리 │ 2. 임베딩 │ 3. 검색  │ 4. 응답 생성  │    │  │
+│  │  │  & 분할  │  (Clova) │ & Rerank │ (HyperCLOVA) │    │  │
+│  │  └──────────┴──────────┴──────────┴──────────────┘    │  │
+│  └───────────────────────────────────────────────────────┘  │
+└──────────────┬──────────────────────────────────────────────┘
+               │
+               ▼
+┌─────────────────────────────────────────────────────────────┐
+│                  FAISS Vector Database                      │
+│  ┌─────────────────┐        ┌──────────────────┐            │
+│  │   정형 데이터    │        │   비정형 데이터   │            │
+│  │ (학사 규정, 교과)│        │ (상담 대화, 후기) │            │
+│  └─────────────────┘        └──────────────────┘            │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-### Frontend 실행
-```bash
-# 프로젝트 루트에서
-npm run dev
-```
----
+### 🔧 Tech Stack
 
-## 작업 프로세스
+#### Frontend
+- **Framework**: React 18.0+ with Vite
+- **Styling**: TailwindCSS
+- **State Management**: React Context API
+- **UI/UX**: Figma 기반 디자인
 
-```bash
-# 📥 작업 시작
-git checkout develop
-git checkout -b feature/작업명
+#### Backend
+- **Framework**: FastAPI 0.100+
+- **Language**: Python 3.9+
+- **API Integration**: Naver Clova Studio APIs
 
-# 💾 작업 완료
-git add .
-git commit -m "feat: [카테고리] 작업 내용"
-git push origin feature/작업명
-# → GitHub에서 PR 생성 (develop으로!)
+#### AI/ML
+- **LLM**: HyperCLOVA X (한국어 특화)
+- **Embedding**: Clova Embedding API
+- **Reranker**: Clova Reranker
+- **Vector DB**: FAISS
 
-# 🔄 Merge 후
-# 1. GitHub에서 Delete branch
-# 2. 로컬 정리
-git checkout develop
-git branch -D feature/작업명
-
-# 📥 다음 작업 전
-# 1. GitHub에서 Sync fork → Update branch
-# 2. 로컬에서 pull
-git checkout develop
-git pull origin develop
-```
+#### Data
+- **Sources**: 
+  - 광운대학교 정보융합학부 공식 홈페이지
+  - 수강신청 자료집
+  - 진로 기초 가이드북
+  - 에브리타임 강의 후기
+- **Volume**: 150턴 멀티턴 대화 데이터
 
 ---
 
-## ⚠️ 주의사항
+## 🎨 시스템 특징
 
-- ❌ **main 브랜치로 PR 금지** → ✅ 항상 `develop`으로
-- ❌ **develop에 직접 commit/push 금지** → ✅ `feature/` 브랜치 사용
-- ✅ **Merge 후 브랜치 삭제 필수**
-- ✅ **다음 작업 전 Fork Sync 필수**
+### 1. 🧠 하이브리드 RAG 아키텍처
 
----
-
-## 🤝 협업 가이드
-
-### 📋 작업 프로세스 (전체 흐름)
-
+**정형 + 비정형 데이터 통합 처리**
 ```
-1. Fork & Clone
-   ↓
-2. 이슈 생성
-   ↓
-3. Feature 브랜치 작업
-   ↓
-4. Push & PR 생성
-   ↓
-5. 라벨/담당자 설정 & 이슈 연결
-   ↓
-6. Merge & 브랜치 삭제
-   ↓
-7. 로컬 동기화 (다음 작업 시)
+정형 데이터 (학사 규정, 커리큘럼) 
+    +
+비정형 데이터 (진로 가이드, 강의 후기)
+    ↓
+통합 벡터 DB (FAISS)
+    ↓
+지능형 검색 & Reranking
+    ↓
+맥락 기반 응답 생성
 ```
 
----
+### 2. 📈 4단계 RAG 파이프라인
 
-### 1️⃣ Fork 및 Clone (최초 1회)
+| 단계 | 프로세스 | 설명 |
+|------|----------|------|
+| **1단계** | 데이터 수집 & 전처리 | PDF → 텍스트 변환 → 의미 단위 분할 |
+| **2단계** | 임베딩 & 벡터화 | HyperCLOVA X 임베딩 → FAISS 저장 |
+| **3단계** | 검색 & 재정렬 | 유사도 검색 → Clova Reranker 적용 |
+| **4단계** | 응답 생성 | 최적 문맥 + HyperCLOVA X → 답변 |
 
-#### GitHub에서 Fork 생성
-1. 저장소 우측 상단 `Fork` 버튼 클릭
-2. ⚠️ **중요**: `Copy the main branch only` 체크 **해제** (모든 브랜치 포함)
-3. `Create fork` 클릭
+### 3. 🎭 S모델 페르소나
 
-#### 로컬로 Clone
-```bash
-git clone https://github.com/본인아이디/Wechu.git
-cd Wechu
-```
+**공감 + 해결책의 완벽한 균형**
 
----
+이전 연구에서 MBTI T/F 특성을 반영한 3가지 모델을 비교 실험한 결과:
+- **T모델** (사고형): 문제 해결 중심
+- **F모델** (감정형): 공감 및 정서적 지지
+- **S모델** (균형형): **공감 + 구체적 해결책** ⭐
 
-### 2️⃣ 이슈 생성
+→ S모델이 **정서적 만족도·문제 해결력·전반적 선호도에서 압도적 우위**
 
-1. **원본 저장소** (munwalk/Wechu)에서 `Issues` 탭 이동
-2. `New issue` 클릭
-3. 제목과 내용 작성
+### 4. 🎯 인간공학적 UI/UX
 
----
-
-### 3️⃣ Feature 브랜치 작업
-
-```bash
-# develop 브랜치에서 feature 브랜치 생성
-git checkout develop
-git checkout -b feature/작업명
-
-# 예시:
-# git checkout -b feature/chatbot
-```
-
-#### 코드 작업 후 커밋
-```bash
-git add .
-git commit -m "feat: [카테고리] 작업 내용"
-git push origin feature/작업명
-```
+- ✅ **직관적 질문 예시** 카드로 진입 장벽 완화
+- ✅ **가독성 최적화** (리스트, 이모티콘, 볼드체 활용)
+- ✅ **로딩 피드백** ("WEcHU가 생각하는 중...")
+- ✅ **후속 질문 추천** 기능으로 대화 지속성 강화
 
 ---
 
-### 4️⃣ Pull Request 생성
+## 📊 실험 결과
 
-1. GitHub의 **본인 Fork 저장소** 접속
-2. `Compare & pull request` 버튼 클릭
-3. **Base repository** 설정:
-   - `base repository`: `munwalk/Wechu`
-   - `base`: `develop` ⚠️ **main이 아님!**
-   - `compare`: `feature/작업명`
+### 실험 설계
+- **대상**: 광운대학교 재학생 24명
+- **방법**: A/B 교차 설계 (WEcHU vs 학교 홈페이지 FAQ)
+- **평가**: BUS-11 사용성, WAI-Short 상호작용, DCS 효과성
+
+### 🏆 핵심 성과
+
+| 지표 | WEcHU | FAQ/가이드 | 비고 |
+|------|--------|------------|------|
+| **과제 성공률** | **98.6%** | 51.4% | ⬆️ 47.2%p |
+| **정확도** | **96.88%** | - | 할루시네이션 최소화 |
+| **응답 일관성** | **SD 5배 ↓** | - | 사용자 무관 균일 품질 |
+| **NPS** | **50점** | - | 적극 추천 수준 |
+
+### 📈 사용성 평가 (10개 차원)
+
+WEcHU가 **8개 차원에서 FAQ보다 우수**:
+- ✅ 정보 검색 노력 절감
+- ✅ 높은 정확성
+- ✅ 사용 편리성
+- ✅ 탐색 효율성
+- ✅ 이해 용이성
+- ✅ 만족도
+- ✅ 재사용 의도
+- ✅ 전반적 선호도
+
+### 💬 사용자 피드백
+
+> "빠르고 정확해서 좋았어요. 학교 홈페이지에서 찾는 것보다 훨씬 편했습니다!"
+
+> "진로 고민을 털어놓을 수 있는 친구 같았어요. 현실적인 조언이 도움이 됐습니다."
+
+> "출처를 명확히 보여주면 더 신뢰가 갈 것 같아요."
 
 ---
 
-### 5️⃣ PR 설정
+## 👥 팀원 소개
 
-#### 우측 사이드바 설정
-- **Assignees**: 본인 지정
-- **Labels**: 작업 성격 선택 (`feat`, `fix`, `docs` 등)
-- **Development**: `Closes #이슈번호` 입력하여 이슈 연결
-
-#### Create pull request 클릭
+<table>
+  <tr>
+    <td align="center">
+      <a href="[https://github.com/hyunjin](https://github.com/peng1204)">
+        <br />
+        <sub><b>김현진</b></sub>
+      </a>
+      <br />
+      <sub>Frontend & DB</sub>
+      <br />
+      <sub>프론트엔드 및 DB 구축</sub>
+    </td>
+    <td align="center">
+      <a href="[https://github.com/seungyeon](https://github.com/tmddustjsdn)">
+        <br />
+        <sub><b>유승연</b></sub>
+      </a>
+      <br />
+      <sub>UI/UX & RAG</sub>
+      <br />
+      <sub>UI/UX 설계, RAG 구현</sub>
+    </td>
+    <td align="center">
+      <a href="[https://github.com/hyejin](https://github.com/moonheyjin)">
+        <br />
+        <sub><b>문혜진</b></sub>
+      </a>
+      <br />
+      <sub>Backend & Research</sub>
+      <br />
+      <sub>백엔드 개발 및 사용자 실험 설계·평가</sub>
+    </td>
+    <td align="center">
+      <a href="[https://github.com/moonsun](https://github.com/munwalk)">
+        <br />
+        <sub><b>장문선</b></sub>
+      </a>
+      <br />
+      <sub>Backend & RAG</sub>
+      <br />
+      <sub>백엔드 개발 및 RAG 구현</sub>
+    </td>
+  </tr>
+</table>
 
 ---
 
-### 6️⃣ Merge 후 정리
+## 🏅 수상 및 인증
 
-#### PR이 Merge 되면:
-
-1. **GitHub에서 브랜치 삭제**
-   - PR 페이지에서 `Delete branch` 버튼 클릭
-
-2. **로컬에서 정리**
-   ```bash
-   git checkout develop
-   git branch -D feature/작업명
-   ```
+- 🏆 2025 산학연계 SW프로젝트 우수상
+- 📜 소프트웨어 저작권 등록 (한국저작권위원회)
+- 📝 학술대회 장려상 (대한인간공학회)
 
 ---
 
-### 7️⃣ 다음 작업 전 동기화
+<div align="center">
 
-⚠️ **다른 팀원의 작업이 Merge된 후, 다음 작업 전에만 실행**
+**Made with ❤️ by WEcHU Team**
 
-#### GitHub에서 Sync (추천 ✅)
-1. **본인 Fork 저장소** 접속
-2. develop 브랜치 선택
-3. `Sync fork` 버튼 클릭
-4. `Update branch` 클릭
+⭐ 이 프로젝트가 도움이 되었다면 Star를 눌러주세요!
 
-#### 로컬에서 Pull
-```bash
-git checkout develop
-git pull origin develop
-```
+[Report Bug](https://github.com/yourrepo/issues) · [Request Feature](https://github.com/yourrepo/issues) · [Contribute](https://github.com/yourrepo/pulls)
+
+</div>
